@@ -13,6 +13,9 @@ AnimSpriteComponent::AnimSpriteComponent(Actor* owner, int drawOrder)
 	:SpriteComponent(owner, drawOrder)
 	, mCurrFrame(0.0f)
 	, mAnimFPS(24.0f)
+	, mCurrentAnimation(-1)
+	, mNextAnimationTimer(0.f)
+	, mCanChangeAnimation(true)
 {
 }
 
@@ -20,16 +23,27 @@ void AnimSpriteComponent::Update(float deltaTime)
 {
 	SpriteComponent::Update(deltaTime);
 
-	if (mAnimTextures.size() > 0)
+	if (!mCanChangeAnimation)
+	{
+		mNextAnimationTimer += deltaTime;
+		
+		if (mNextAnimationTimer > 0.5f)
+		{
+			mCanChangeAnimation = true;
+			mNextAnimationTimer = 0.f;
+		}
+	}
+	
+	if (!mAnimTextures.empty())
 	{
 		// Update the current frame based on frame rate
 		// and delta time
 		mCurrFrame += mAnimFPS * deltaTime;
 		
 		// Wrap current frame if needed
-		while (mCurrFrame >= mAnimTextures.size())
+		while (mCurrFrame >= mAnimationStartEnd[mCurrentAnimation].second + 1)
 		{
-			mCurrFrame -= mAnimTextures.size();
+			mCurrFrame -= mAnimationStartEnd[mCurrentAnimation].second - mAnimationStartEnd[mCurrentAnimation].first;
 		}
 
 		// Set the current texture
@@ -39,11 +53,32 @@ void AnimSpriteComponent::Update(float deltaTime)
 
 void AnimSpriteComponent::SetAnimTextures(const std::vector<SDL_Texture*>& textures)
 {
-	mAnimTextures = textures;
-	if (mAnimTextures.size() > 0)
+	if (!textures.empty())
 	{
+		mCurrFrame = mAnimTextures.size();
+		mAnimationStartEnd.emplace_back(std::make_pair(mCurrFrame, mCurrFrame + textures.size() - 1));
+
+		SDL_Log("Animation start: %i Animation end: %i", mAnimationStartEnd.back().first, mAnimationStartEnd.back().second);
+
+		mAnimTextures.insert(mAnimTextures.end(), textures.begin(), textures.end());
+		
 		// Set the active texture to first frame
-		mCurrFrame = 0.0f;
-		SetTexture(mAnimTextures[0]);
+		SetTexture(mAnimTextures[mCurrFrame]);
+		mCurrentAnimation++;
+	}
+}
+
+void AnimSpriteComponent::NextAnimation()
+{
+	if (mAnimationStartEnd.size() > 1 && mCanChangeAnimation)
+	{
+		if (++mCurrentAnimation == mAnimationStartEnd.size())
+		{
+			mCurrentAnimation = 0;
+		}
+
+		SetTexture(mAnimTextures[mAnimationStartEnd[mCurrentAnimation].first]);
+
+		mCanChangeAnimation = false;
 	}
 }

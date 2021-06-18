@@ -19,4 +19,5 @@ public:
 private:
 	float mRightSpeed;
 	float mDownSpeed;
+	class AnimSpriteComponent* asc;
 };

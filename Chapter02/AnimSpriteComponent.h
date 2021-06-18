@@ -20,6 +20,7 @@ public:
 	// Set/get the animation FPS
 	float GetAnimFPS() const { return mAnimFPS; }
 	void SetAnimFPS(float fps) { mAnimFPS = fps; }
+	void NextAnimation();
 private:
 	// All textures in the animation
 	std::vector<SDL_Texture*> mAnimTextures;
@@ -27,4 +28,11 @@ private:
 	float mCurrFrame;
 	// Animation frame rate
 	float mAnimFPS;
+
+	int mCurrentAnimation;
+
+	std::vector<std::pair<int, int>> mAnimationStartEnd;
+
+	float mNextAnimationTimer;
+	bool mCanChangeAnimation;
 };

@@ -16,14 +16,24 @@ Ship::Ship(Game* game)
 	,mDownSpeed(0.0f)
 {
 	// Create an animated sprite component
-	AnimSpriteComponent* asc = new AnimSpriteComponent(this);
-	std::vector<SDL_Texture*> anims = {
+	asc = new AnimSpriteComponent(this);
+	std::vector<SDL_Texture*> shipAnimation = {
 		game->GetTexture("Assets/Ship01.png"),
 		game->GetTexture("Assets/Ship02.png"),
 		game->GetTexture("Assets/Ship03.png"),
 		game->GetTexture("Assets/Ship04.png"),
 	};
-	asc->SetAnimTextures(anims);
+	asc->SetAnimTextures(shipAnimation);
+
+	std::vector<SDL_Texture*> walkingAnimation = {
+		game->GetTexture("Assets/Character01.png"),
+		game->GetTexture("Assets/Character02.png"),
+		game->GetTexture("Assets/Character03.png"),
+		game->GetTexture("Assets/Character04.png"),
+		game->GetTexture("Assets/Character05.png"),
+		game->GetTexture("Assets/Character06.png"),
+	};
+	asc->SetAnimTextures(walkingAnimation);
 }
 
 void Ship::UpdateActor(float deltaTime)
@@ -74,5 +84,9 @@ void Ship::ProcessKeyboard(const uint8_t* state)
 	if (state[SDL_SCANCODE_W])
 	{
 		mDownSpeed -= 300.0f;
+	}
+	if (state[SDL_SCANCODE_E])
+	{
+		asc->NextAnimation();
 	}
 }
