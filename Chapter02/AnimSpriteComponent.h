@@ -9,6 +9,21 @@
 #pragma once
 #include "SpriteComponent.h"
 #include <vector>
+
+class AnimSpriteInfo 
+{
+public:
+	AnimSpriteInfo(int start, int end, bool looping)
+	:start(start)
+	,end(end)
+	,looping(looping)
+	{}
+
+	int start;
+	int end;
+	bool looping;
+};
+
 class AnimSpriteComponent : public SpriteComponent
 {
 public:
@@ -16,7 +31,7 @@ public:
 	// Update animation every frame (overriden from component)
 	void Update(float deltaTime) override;
 	// Set the textures used for animation
-	void SetAnimTextures(const std::vector<SDL_Texture*>& textures);
+	void SetAnimTextures(const std::vector<SDL_Texture*>& textures, bool looping = true);
 	// Set/get the animation FPS
 	float GetAnimFPS() const { return mAnimFPS; }
 	void SetAnimFPS(float fps) { mAnimFPS = fps; }
@@ -31,7 +46,7 @@ private:
 
 	int mCurrentAnimation;
 
-	std::vector<std::pair<int, int>> mAnimationStartEnd;
+	std::vector<AnimSpriteInfo> mAnimSpriteInfos;
 
 	float mNextAnimationTimer;
 	bool mCanChangeAnimation;

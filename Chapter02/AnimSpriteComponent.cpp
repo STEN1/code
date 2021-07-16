@@ -41,9 +41,16 @@ void AnimSpriteComponent::Update(float deltaTime)
 		mCurrFrame += mAnimFPS * deltaTime;
 		
 		// Wrap current frame if needed
-		while (mCurrFrame >= mAnimationStartEnd[mCurrentAnimation].second + 1)
+		while (mCurrFrame >= mAnimSpriteInfos[mCurrentAnimation].end + 1)
 		{
-			mCurrFrame -= mAnimationStartEnd[mCurrentAnimation].second - mAnimationStartEnd[mCurrentAnimation].first;
+			if (!mAnimSpriteInfos[mCurrentAnimation].looping)
+			{
+				mCurrFrame = mAnimSpriteInfos[mCurrentAnimation].end;
+			}
+			else
+			{
+				mCurrFrame -= mAnimSpriteInfos[mCurrentAnimation].end - mAnimSpriteInfos[mCurrentAnimation].start;
+			}
 		}
 
 		// Set the current texture
@@ -51,14 +58,14 @@ void AnimSpriteComponent::Update(float deltaTime)
 	}
 }
 
-void AnimSpriteComponent::SetAnimTextures(const std::vector<SDL_Texture*>& textures)
+void AnimSpriteComponent::SetAnimTextures(const std::vector<SDL_Texture*>& textures, bool looping)
 {
 	if (!textures.empty())
 	{
 		mCurrFrame = mAnimTextures.size();
-		mAnimationStartEnd.emplace_back(std::make_pair(mCurrFrame, mCurrFrame + textures.size() - 1));
+		mAnimSpriteInfos.emplace_back(mCurrFrame, (mCurrFrame + textures.size() - 1), looping);
 
-		SDL_Log("Animation start: %i Animation end: %i", mAnimationStartEnd.back().first, mAnimationStartEnd.back().second);
+		SDL_Log("Animation start: %i Animation end: %i", mAnimSpriteInfos.back().start, mAnimSpriteInfos.back().end);
 
 		mAnimTextures.insert(mAnimTextures.end(), textures.begin(), textures.end());
 		
@@ -70,14 +77,14 @@ void AnimSpriteComponent::SetAnimTextures(const std::vector<SDL_Texture*>& textu
 
 void AnimSpriteComponent::NextAnimation()
 {
-	if (mAnimationStartEnd.size() > 1 && mCanChangeAnimation)
+	if (mAnimSpriteInfos.size() > 1 && mCanChangeAnimation)
 	{
-		if (++mCurrentAnimation == mAnimationStartEnd.size())
+		if (++mCurrentAnimation == mAnimSpriteInfos.size())
 		{
 			mCurrentAnimation = 0;
 		}
 
-		SetTexture(mAnimTextures[mAnimationStartEnd[mCurrentAnimation].first]);
+		SetTexture(mAnimTextures[mAnimSpriteInfos[mCurrentAnimation].start]);
 
 		mCanChangeAnimation = false;
 	}

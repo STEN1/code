@@ -33,7 +33,7 @@ Ship::Ship(Game* game)
 		game->GetTexture("Assets/Character05.png"),
 		game->GetTexture("Assets/Character06.png"),
 	};
-	asc->SetAnimTextures(walkingAnimation);
+	asc->SetAnimTextures(walkingAnimation, false);
 }
 
 void Ship::UpdateActor(float deltaTime)
