@@ -10,9 +10,8 @@
 #include "SpriteComponent.h"
 #include <vector>
 
-class AnimSpriteInfo 
+struct AnimSpriteInfo 
 {
-public:
 	AnimSpriteInfo(int start, int end, bool looping)
 	:start(start)
 	,end(end)
